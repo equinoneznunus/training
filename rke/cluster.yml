@@ -35,7 +35,7 @@ authorization:
   mode: rbac
   options: {}
 ignore_docker_version: false
-kubernetes_version:
+kubernetes_version: v1.20.11-rancher1-2
 monitoring:
   provider: ""
   options: {}
