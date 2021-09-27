@@ -1,0 +1,48 @@
+ssh_key_path: ~/.ssh/id_rsa
+nodes:
+- address: YOUR-SERVER-NAME
+  port: 22
+  internal_address: YOUR-SERVER-IP
+  role:
+  - controlplane
+  - etcd
+  - worker
+  hostname_override: ""
+  user: rke
+  labels: {}
+  taints: []
+services:
+  etcd:
+    snapshot: true
+  kube-api:
+    service_cluster_ip_range: 10.108.0.0/16
+  kube-controller:
+    cluster_cidr: 10.109.0.0/16
+    service_cluster_ip_range: 10.108.0.0/16
+  kubelet:
+    cluster_domain: cluster.local
+    cluster_dns_server: 10.108.0.10
+    fail_swap_on: true
+    generate_serving_certificate: false
+network:
+  plugin: canal
+  mtu: 0
+  update_strategy: null
+authentication:
+  strategy: x509
+  webhook: null
+authorization:
+  mode: rbac
+  options: {}
+ignore_docker_version: false
+kubernetes_version:
+monitoring:
+  provider: ""
+  options: {}
+  node_selector: {}
+  update_strategy: null
+  replicas: null
+restore:
+  restore: false
+  snapshot_name: ""
+dns: null
