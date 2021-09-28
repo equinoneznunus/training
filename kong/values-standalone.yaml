@@ -1,5 +1,5 @@
 image:
-  repository: kong
+  repository: quay.io/equinoneznunus/kong
   tag: "2.3"
 
 replicaCount: 2
