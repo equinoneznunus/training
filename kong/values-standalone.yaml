@@ -1,0 +1,59 @@
+image:
+  repository: kong
+  tag: "2.3"
+
+replicaCount: 2
+
+env:
+  prefix: /kong_prefix/
+  database: postgres
+  trusted_ips: 0.0.0.0/0
+  password:
+    valueFrom:
+      secretKeyRef:
+         name: secret-kong
+         key: password
+
+admin:
+  enabled: true
+  type: "ClusterIP"
+  http:
+    enabled: true
+    servicePort: 8001
+    containerPort: 8001
+
+proxy:
+  http:
+    enabled: true
+    servicePort: 80
+    containerPort: 8000
+  tls:
+    enabled: true
+    servicePort: 443
+    containerPort: 8443
+  type: "ClusterIP"
+  ingress:
+    enabled: true
+    path: /
+    hosts:
+        - api-gateway.example.com
+
+postgresql:
+  enabled: true
+  postgresqlUsername: kong
+  postgresqlDatabase: kong
+  postgresqlPassword: BFzAKIATXIDI5NSNCB
+  image:
+    tag: 11.7.0-debian-10-r37
+  service:
+    port: 5432
+
+ingressController:
+  enabled: true
+  installCRDs: false
+  env:
+   kong_admin_token:
+     valueFrom:
+       secretKeyRef:
+          name: secret-kong
+          key: password
