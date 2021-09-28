@@ -2,7 +2,7 @@ image:
   repository: quay.io/equinoneznunus/kong
   tag: "2.3"
 
-replicaCount: 2
+replicaCount: 1
 
 env:
   prefix: /kong_prefix/
