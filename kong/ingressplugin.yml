@@ -15,4 +15,5 @@ spec:
         backend:
           service:
             name: echo
-            port: 80
+            port:
+              number: 80
