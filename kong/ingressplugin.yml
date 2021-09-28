@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-example-com
+  annotations:
+    konghq.com/plugins: request-id
+spec:
+  ingressClassName: kong
+  rules:
+  - host: api-gateway.example.com
+    http:
+      paths:
+      - path: /bar
+        pathType: ImplementationSpecific
+        backend:
+          serviceName: echo
+          servicePort: 80
