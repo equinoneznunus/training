@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-config
+type: Opaque
+data:
+  postgresdb: cG9zdGdyZXNkYg==
+  postgresadmin: cG9zdGdyZXNhZG1pbg==
+  postgrespassword: VDFnMDIwMy5IZVIzNDUyMQ==
+  pgdata: L3Zhci9saWIvcG9zdGdyZXNxbC9kYXRhL3BnZGF0YS8=
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:10.4
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+          - name: PGDATA
+            valueFrom:
+              secretKeyRef:
+                name: postgres-config
+                key: pgdata
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: postgres-config
+                key: postgresdb
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-config
+                key: postgresadmin
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-config
+                key: postgrespassword
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+   - port: 5432
+  selector:
+   app: postgres

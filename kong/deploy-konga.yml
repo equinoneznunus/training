@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: konga
+spec:
+  selector:
+    matchLabels:
+      app: konga
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: konga
+        app: konga
+    spec:
+      containers:
+      - name: konga
+        image: pantsel/konga:0.14.9
+        env:
+        - name: DB_ADAPTER
+          value: postgres
+        - name: DB_HOST
+          value: postgres
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-config
+              key: postgresadmin
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-config
+              key: postgrespassword
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: postgres-config
+              key: postgresdb
+        - name: TOKEN_SECRET
+          value: 6AEBF6282EF371E6AEEE1BB1B31A6
+        ports:
+        - containerPort: 1337
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: konga
+  name: konga-svc
+spec:
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 1337
+  selector:
+    app: konga
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: konga
+spec:
+  rules:
+  - host: konga-frj.apps.csdprfap.comcel.com.gt
+    http:
+      paths:
+      - backend:
+          serviceName: konga-svc
+          servicePort: 443
+        path: /
