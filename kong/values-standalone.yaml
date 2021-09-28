@@ -50,6 +50,9 @@ postgresql:
 
 ingressController:
   enabled: true
+  image:
+    repository: quay.io/equinoneznunus/kubernetes-ingress-controller
+    tag: "1.3"
   installCRDs: false
   env:
    kong_admin_token:
